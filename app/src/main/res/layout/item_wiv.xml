@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="it is cool"
+        android:textSize="18sp" />
+
+    <io.github.bleoo.windowimageview.WindowImageView
+        android:id="@+id/window_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        app:src="@drawable/timg" />
+
+</LinearLayout>
