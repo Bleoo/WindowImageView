@@ -2,6 +2,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
+def siteUrl = 'https://github.com/Bleoo/WindowImageView'   // 项目的主页
+def gitUrl = 'https://github.com/Bleoo/WindowImageView.git'   // Git仓库的url
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+version = "1.0" //发布版本号
+group = "io.github.bleoo" //最终引用形式，如compile 'com.leon.lfilepicker:1.0.0'，其中lfilepicker在后面配置
+
 android {
     compileSdkVersion 26
 
@@ -33,4 +42,69 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     implementation 'com.android.support:recyclerview-v7:26.1.0'
+}
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "library"
+        name = "WindowImageView"    //发布到JCenter上的项目名字
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["MIT"]
+        publish = true
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                // Add your description here
+                name 'ImageView like window'     //项目的描述 你可以多写一点
+                artifactId = 'WindowImageView'//项目名称
+                url siteUrl
+                // Set your license
+                licenses {
+                    license {
+                        name 'MIT' //和之前自己定义的协议一致
+                        url 'https://raw.githubusercontent.com/minggo620/Pluto-Android/master/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'Bleoo'        //填写的一些基本信息
+                        name 'Bleoo'
+                        email '915692722@qq.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
 }
