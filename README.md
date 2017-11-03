@@ -2,7 +2,7 @@
 
 An ImageView display in RecyclerView, looks like window.
 
-![](https://github.com/Bleoo/WindowImageView/master/pictures/20171103175130.gif)
+![](https://github.com/Bleoo/WindowImageView/blob/master/pictures/20171103175130.gif)
 
 ## Usage
 
