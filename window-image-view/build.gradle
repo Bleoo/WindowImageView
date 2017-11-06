@@ -15,7 +15,7 @@ android {
     compileSdkVersion 26
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 14
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -66,7 +66,6 @@ install {
                 packaging 'aar'
                 // Add your description here
                 name 'ImageView like window'     //项目的描述 你可以多写一点
-                artifactId = 'WindowImageView'//项目名称
                 url siteUrl
                 // Set your license
                 licenses {
