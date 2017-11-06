@@ -6,6 +6,21 @@ An ImageView display in RecyclerView, looks like window.
 
 ## Usage
 
+JitPack.io, add jitpack.io repositiory and dependency to your build.gradle:
+
+```groovy
+repositories {
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+   dependencies {
+       compile 'com.github.Bleoo:WindowImageView:1.0'
+   }
+```
+
+
 ```xml
  <io.github.bleoo.windowimageview.WindowImageView
         android:id="@+id/window_image_view"
