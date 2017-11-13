@@ -65,6 +65,8 @@ public class MyAdaper extends RecyclerView.Adapter<MyAdaper.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (position == 4) {
+//            holder.window_image_view.setImageURI(Uri.parse("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1510654468262&di=c878e5c02043f8dc7720abaab760549e&imgtype=0&src=http%3A%2F%2Fimg.bbs.cnhubei.com%2Fforum%2Fdvbbs%2F2004-4%2F200441915031894.jpg"));
+//            holder.window_image_view.setImageURI(Uri.parse("res://包名(实际可以是任何字符串甚至留空)/" + R.drawable.timg));
             holder.window_image_view.bindRecyclerView(recyclerView);
         }
     }

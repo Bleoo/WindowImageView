@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="WindowImageView">
         <attr name="src" format="reference" />
+        <attr name="frescoEnable" format="boolean" />
     </declare-styleable>
 </resources>

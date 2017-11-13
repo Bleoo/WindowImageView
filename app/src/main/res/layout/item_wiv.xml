@@ -16,6 +16,7 @@
         android:id="@+id/window_image_view"
         android:layout_width="match_parent"
         android:layout_height="180dp"
+        app:frescoEnable="false"
         app:src="@drawable/timg" />
 
 </LinearLayout>
