@@ -65,7 +65,7 @@ public class MyAdaper extends RecyclerView.Adapter<MyAdaper.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (position == 4) {
-            holder.window_image_view.bindRecyclerView(recyclerView, position);
+            holder.window_image_view.bindRecyclerView(recyclerView);
         }
     }
 

@@ -33,6 +33,8 @@ public class WindowImageView extends View {
     private float disPlayTop;       // current draw top
     private int[] location;
 
+    private boolean resacling;
+
     public WindowImageView(Context context) {
         super(context);
         init(context, null);
@@ -93,6 +95,9 @@ public class WindowImageView extends View {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
+        if(resacling){
+            return;
+        }
         reScaleBitmap();
 
         if (mScaleBitmap != null) {
@@ -123,16 +128,23 @@ public class WindowImageView extends View {
         if (mBitmap == null) {
             return;
         }
-        float scale = 1.0f * getWidth() / mBitmap.getWidth();
-        Log.e(TAG, "scale : " + scale);
-        mMatrix.reset();
-        mMatrix.postScale(scale, scale);
-        mScaleBitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), mMatrix, true);
-        mBitmap.recycle();
-        mBitmap = null;
-        resetTransMultiple();
-        disPlayTop -= (location[1] - rvLocation[1]) * translationMultiple;
-        boundTop();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                resacling = true;
+                float scale = 1.0f * getWidth() / mBitmap.getWidth();
+                Log.e(TAG, "scale : " + scale);
+                mMatrix.reset();
+                mMatrix.postScale(scale, scale);
+                mScaleBitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), mMatrix, true);
+                mBitmap.recycle();
+                mBitmap = null;
+                resetTransMultiple();
+                disPlayTop -= (location[1] - rvLocation[1]) * translationMultiple;
+                boundTop();
+                resacling = false;
+            }
+        }).start();
     }
 
     private void boundTop() {
@@ -151,7 +163,7 @@ public class WindowImageView extends View {
     private float translationMultiple = 1.0f;
     private int[] rvLocation;
 
-    public void bindRecyclerView(RecyclerView recyclerView, int position) {
+    public void bindRecyclerView(RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
         rvLocation = new int[2];
         recyclerView.getLocationInWindow(rvLocation);

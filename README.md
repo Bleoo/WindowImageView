@@ -28,6 +28,9 @@ repositories {
         android:layout_height="180dp"
         app:src="@drawable/timg" />
 ```
+```java
+window_image_view.bindRecyclerView(recyclerView);
+```
 
 ## MIT License
 
