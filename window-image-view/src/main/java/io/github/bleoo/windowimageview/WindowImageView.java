@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -141,6 +142,13 @@ public class WindowImageView extends View {
         }
         if (disPlayTop < mMimDisPlayTop) {
             disPlayTop = mMimDisPlayTop;
+        }
+    }
+
+    public void setImageResource(@DrawableRes int resId) {
+        this.resId = resId;
+        if (isMeasured && mDrawableController != null) {
+            mDrawableController.process();
         }
     }
 

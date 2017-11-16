@@ -16,7 +16,7 @@ repositories {
 }
 
    dependencies {
-       compile 'com.github.Bleoo:WindowImageView:1.0'
+       compile 'com.github.Bleoo:WindowImageView:1.1'
    }
 ```
 
@@ -26,10 +26,22 @@ repositories {
         android:id="@+id/window_image_view"
         android:layout_width="match_parent"
         android:layout_height="180dp"
+        app:frescoEnable="false"
         app:src="@drawable/timg" />
 ```
 ```java
+window_image_view.setFrescoEnable(true);
+window_image_view.setImageResource(R.drawable.timg);
 window_image_view.bindRecyclerView(recyclerView);
+```
+
+### With Fresco
+```xml
+app:frescoEnable="false"
+```
+```java
+window_image_view.setFrescoEnable(true);
+window_image_view.setImageURI(YourUri);
 ```
 
 ## MIT License
