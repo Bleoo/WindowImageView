@@ -45,6 +45,10 @@ public class DrawableController {
 
     private ProcessListener listener;
 
+    // status
+    private boolean hasNewThread;
+    private int currentThreadNum;
+
     public DrawableController(Context context, int drawableResId, WindowImageView view) {
         mContext = context;
         mDrawableResId = drawableResId;
@@ -68,9 +72,15 @@ public class DrawableController {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    currentThreadNum++;
+                    if(currentThreadNum > 1){
+                        hasNewThread = true;
+                    }
+
                     Resources resources = mContext.getResources();
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inJustDecodeBounds = true;
+
                     BitmapFactory.decodeResource(resources, mDrawableResId, options);
 
                     // options.outWidth is dp, need do dp -> px
@@ -89,12 +99,33 @@ public class DrawableController {
                     Log.e(TAG, "inSampleSize: " + options.inSampleSize);
                     options.inJustDecodeBounds = false;
                     options.inPreferredConfig = Bitmap.Config.ARGB_4444;
+
+                    if (!checkContinue()) {
+                        return;
+                    }
+
                     sourceBitmap = BitmapFactory.decodeResource(resources, mDrawableResId, options);
 
                     mMatrix.reset();
                     mMatrix.postScale(scale, scale);
+                    Log.e(TAG, "sourceBitmap.getWidth(): " + sourceBitmap.getWidth());
+                    Log.e(TAG, "sourceBitmap.getHeight(): " + sourceBitmap.getHeight());
+
+                    if (!checkContinue()) {
+                        return;
+                    }
                     targetBitmap = Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight(), mMatrix, true);
                     targetDrawable = new BitmapDrawable(targetBitmap);
+
+                    if (!checkContinue()) {
+                        return;
+                    }
+                    mView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mView.invalidate();
+                        }
+                    });
 
                     if (sourceBitmap != null) {
                         sourceBitmap.recycle();
@@ -103,6 +134,15 @@ public class DrawableController {
                 }
             }).start();
         }
+    }
+
+    private boolean checkContinue() {
+        if (hasNewThread || mView == null) {
+            currentThreadNum--;
+            hasNewThread = false;
+            return false;
+        }
+        return true;
     }
 
     private void initDraweeHolder() {

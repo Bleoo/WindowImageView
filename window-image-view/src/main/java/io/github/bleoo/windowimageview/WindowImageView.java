@@ -33,7 +33,6 @@ public class WindowImageView extends View {
     private int[] location;         // location in window
 
     private boolean isMeasured;
-    private int finalWidth;
     private int rescaleHeight;
 
     private DrawableController mDrawableController;
@@ -81,6 +80,16 @@ public class WindowImageView extends View {
                 boundTop();
             }
         });
+
+        // When looper calls it, view has been initialized
+        post(new Runnable() {
+            @Override
+            public void run() {
+                if(isMeasured){
+                    mDrawableController.process();
+                }
+            }
+        });
     }
 
     @Override
@@ -93,8 +102,6 @@ public class WindowImageView extends View {
         setMeasuredDimension(width, height);
 
         isMeasured = true;
-        finalWidth = width;
-        mDrawableController.process();
     }
 
     public int getFinalWidthWidth() {
@@ -221,7 +228,9 @@ public class WindowImageView extends View {
                 if (getTopDistance() > 0 && getTopDistance() + getHeight() < recyclerView.getBottom()) {
                     disPlayTop += dy * translationMultiple;
                     boundTop();
-                    invalidate();
+                    if(isMeasured){
+                        invalidate();
+                    }
                 }
             }
         });
