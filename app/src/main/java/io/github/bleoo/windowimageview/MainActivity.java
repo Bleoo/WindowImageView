@@ -1,9 +1,12 @@
 package io.github.bleoo.windowimageview;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.view.ViewGroup;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,6 +19,57 @@ public class MainActivity extends AppCompatActivity {
 
         rv_content = findViewById(R.id.rv_content);
         rv_content.setLayoutManager(new LinearLayoutManager(this));
-        rv_content.setAdapter(new MyAdaper(this, rv_content));
+        rv_content.setAdapter(new MyAdapter());
+    }
+
+    class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
+
+        @Override
+        public int getItemViewType(int position) {
+            if (position == 15) {
+                return 1;
+            }
+            return 0;
+        }
+
+        @Override
+        public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view;
+            if (viewType == 1) {
+                view = View.inflate(MainActivity.this, R.layout.item1, null);
+            } else {
+                view = View.inflate(MainActivity.this, R.layout.item0, null);
+                RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                view.setLayoutParams(lp);
+            }
+            return new MyHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(MyHolder holder, int position) {
+            if (position == 15) {
+                holder.windowImageView.bindRecyclerView(rv_content);
+                holder.windowImageView.setImageResource(R.drawable.timg);
+//                holder.windowImageView.setImageURI(Uri.parse("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1510654468262&di=c878e5c02043f8dc7720abaab760549e&imgtype=0&src=http%3A%2F%2Fimg.bbs.cnhubei.com%2Fforum%2Fdvbbs%2F2004-4%2F200441915031894.jpg"));
+//                holder.windowImageView.setImageURI(Uri.parse("res://包名(实际可以是任何字符串甚至留空)/" + R.drawable.timg));
+            } else {
+                holder.itemView.setBackgroundColor(Color.rgb((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return 30;
+        }
+
+        class MyHolder extends RecyclerView.ViewHolder {
+
+            WindowImageView windowImageView;
+
+            public MyHolder(View itemView) {
+                super(itemView);
+                windowImageView = itemView.findViewById(R.id.wiv);
+            }
+        }
     }
 }

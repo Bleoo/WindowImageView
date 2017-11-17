@@ -69,7 +69,7 @@ public class WindowImageView extends View {
         }
         location = new int[2];
 
-        mDrawableController = new DrawableController(mContext, resId, this);
+        mDrawableController = new DrawableController(mContext, this);
         mDrawableController.setFrescoEnable(frescoEnable);
         mDrawableController.setProcessListener(new ProcessListener() {
             @Override
@@ -152,6 +152,10 @@ public class WindowImageView extends View {
         }
     }
 
+    public int getImageResource() {
+        return resId;
+    }
+
     /*
         ----------------------------- 以下为 fresco -----------------------------
      */
@@ -176,12 +180,14 @@ public class WindowImageView extends View {
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        unbindRecyclerView();
         mDrawableController.doDetach();
     }
 
     @Override
     public void onStartTemporaryDetach() {
         super.onStartTemporaryDetach();
+        unbindRecyclerView();
         mDrawableController.doDetach();
     }
 
@@ -199,6 +205,9 @@ public class WindowImageView extends View {
 
     public Uri getUri() {
         if (resUri == null) {
+            if(resId == 0){
+                return null;
+            }
             return UriUtil.getUriForResourceId(resId);
         }
         return resUri;
@@ -218,10 +227,13 @@ public class WindowImageView extends View {
     private RecyclerView.OnScrollListener rvScrollListener;
     private float translationMultiple = 1.0f;
     private int[] rvLocation;
+    private int rvHeight;
 
     public void bindRecyclerView(RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
         rvLocation = new int[2];
+        rvHeight = recyclerView.getLayoutManager().getHeight();
+        Log("height : " + rvHeight);
         recyclerView.getLocationInWindow(rvLocation);
         recyclerView.addOnScrollListener(rvScrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -233,7 +245,8 @@ public class WindowImageView extends View {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 Log.e(TAG, "dx : " + dx + ", dy : " + dy);
-                if (getTopDistance() > 0 && getTopDistance() + getHeight() < recyclerView.getBottom()) {
+                if (getTopDistance() > 0 && getTopDistance() + getHeight() < rvHeight) {
+                    Log.e(TAG, "onScrolled translationMultiple : " + translationMultiple);
                     disPlayTop += dy * translationMultiple;
                     boundTop();
                     if(isMeasured){
@@ -255,8 +268,6 @@ public class WindowImageView extends View {
 
     private void resetTransMultiple(int scaledHeight) {
         if (recyclerView != null) {
-            int height = recyclerView.getLayoutManager().getHeight();
-            Log("height : " + height);
             /*
                 |------------------------| recyclerView
                 |----| item
@@ -269,7 +280,7 @@ public class WindowImageView extends View {
                 bitmap draw top : 0 ~ bitmapHeight - thisHeight
              */
             mMimDisPlayTop = -scaledHeight + getHeight();
-            translationMultiple = 1.0f * -mMimDisPlayTop / (height - getHeight());
+            translationMultiple = 1.0f * -mMimDisPlayTop / (rvHeight - getHeight());
             Log("translationMultiple : " + translationMultiple);
         }
     }

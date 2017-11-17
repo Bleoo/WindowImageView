@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Log;
 import android.util.TypedValue;
 
@@ -27,7 +28,6 @@ public class DrawableController {
     private static final String TAG = "DrawableController";
 
     private Context mContext;
-    private int mDrawableResId;
     private WindowImageView mView;
 
     private Drawable sourceDrawable;
@@ -49,9 +49,8 @@ public class DrawableController {
     private boolean hasNewThread;
     private int currentThreadNum;
 
-    public DrawableController(Context context, int drawableResId, WindowImageView view) {
+    public DrawableController(Context context, WindowImageView view) {
         mContext = context;
-        mDrawableResId = drawableResId;
         mView = view;
 
         mMatrix = new Matrix();
@@ -59,6 +58,10 @@ public class DrawableController {
 
     public void process() {
         if (frescoEnable) {
+            Uri uri = mView.getUri();
+            if (uri == null) {
+                return;
+            }
             initDraweeHolder();
             ImageRequest request = ImageRequestBuilder.newBuilderWithSource(mView.getUri())
                     .setPostprocessor(getReScalePostprocessor())
@@ -72,8 +75,13 @@ public class DrawableController {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    int drawableResId = mView.getImageResource();
+                    if (drawableResId == 0) {
+                        return;
+                    }
+
                     currentThreadNum++;
-                    if(currentThreadNum > 1){
+                    if (currentThreadNum > 1) {
                         hasNewThread = true;
                     }
 
@@ -81,7 +89,7 @@ public class DrawableController {
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inJustDecodeBounds = true;
 
-                    BitmapFactory.decodeResource(resources, mDrawableResId, options);
+                    BitmapFactory.decodeResource(resources, drawableResId, options);
 
                     // options.outWidth is dp, need do dp -> px
                     int outWidthPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, options.outWidth, resources.getDisplayMetrics());
@@ -104,7 +112,7 @@ public class DrawableController {
                         return;
                     }
 
-                    sourceBitmap = BitmapFactory.decodeResource(resources, mDrawableResId, options);
+                    sourceBitmap = BitmapFactory.decodeResource(resources, drawableResId, options);
 
                     mMatrix.reset();
                     mMatrix.postScale(scale, scale);
