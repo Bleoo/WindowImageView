@@ -125,6 +125,7 @@ public class DrawableController {
                     targetBitmap = Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight(), mMatrix, true);
                     targetDrawable = new BitmapDrawable(targetBitmap);
 
+
                     if (!checkContinue()) {
                         return;
                     }
@@ -139,6 +140,8 @@ public class DrawableController {
                         sourceBitmap.recycle();
                         sourceBitmap = null;
                     }
+
+                    currentThreadNum--;
                 }
             }).start();
         }
@@ -184,7 +187,7 @@ public class DrawableController {
 
     private ReScalePostprocessor getReScalePostprocessor() {
         if (reScalePostprocessor == null) {
-            reScalePostprocessor = new ReScalePostprocessor(mView.getMeasuredWidth(), listener);
+            reScalePostprocessor = new ReScalePostprocessor(mView.getFinalWidthWidth(), listener);
         }
         return reScalePostprocessor;
     }
@@ -204,17 +207,15 @@ public class DrawableController {
     }
 
     public void doDetach() {
-        if (mDraweeHolder == null) {
-            return;
+        if (mDraweeHolder != null) {
+            mDraweeHolder.onDetach();
         }
-        mDraweeHolder.onDetach();
     }
 
     public void doAttach() {
-        if (mDraweeHolder == null) {
-            return;
+        if (mDraweeHolder != null) {
+            mDraweeHolder.onAttach();
         }
-        mDraweeHolder.onAttach();
     }
 
     @Override

@@ -9,6 +9,6 @@
         android:layout_height="200dp"
         android:gravity="center"
         android:textColor="@android:color/white"
-        android:text="it is cool"/>
+        android:text=""/>
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package io.github.bleoo.windowimageview;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +27,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemViewType(int position) {
-            if (position == 15) {
+            if (position == 9) {
+                return 1;
+            }
+            if (position == 19) {
                 return 1;
             }
             return 0;
@@ -47,11 +51,16 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(MyHolder holder, int position) {
-            if (position == 15) {
+            if (position == 9) {
                 holder.windowImageView.bindRecyclerView(rv_content);
+                holder.windowImageView.setFrescoEnable(false);
+                holder.windowImageView.setImageResource(R.drawable.timg2);
+            } else if (position == 19) {
+                holder.windowImageView.bindRecyclerView(rv_content);
+                holder.windowImageView.setFrescoEnable(false);
                 holder.windowImageView.setImageResource(R.drawable.timg);
+//                holder.windowImageView.setFrescoEnable(true);
 //                holder.windowImageView.setImageURI(Uri.parse("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1510654468262&di=c878e5c02043f8dc7720abaab760549e&imgtype=0&src=http%3A%2F%2Fimg.bbs.cnhubei.com%2Fforum%2Fdvbbs%2F2004-4%2F200441915031894.jpg"));
-//                holder.windowImageView.setImageURI(Uri.parse("res://包名(实际可以是任何字符串甚至留空)/" + R.drawable.timg));
             } else {
                 holder.itemView.setBackgroundColor(Color.rgb((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
             }
