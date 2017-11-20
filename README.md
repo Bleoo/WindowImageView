@@ -4,6 +4,8 @@ An ImageView display in RecyclerView, looks like window.
 
 ![](https://github.com/Bleoo/WindowImageView/blob/master/pictures/20171103175130.gif)
 
+![](https://github.com/Bleoo/WindowImageView/blob/master/pictures/20171120143754.gif)
+
 ## Usage
 
 JitPack.io, add jitpack.io repositiory and dependency to your build.gradle:
