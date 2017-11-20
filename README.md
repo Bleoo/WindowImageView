@@ -16,7 +16,7 @@ repositories {
 }
 
    dependencies {
-       compile 'com.github.Bleoo:WindowImageView:1.1'
+       compile 'com.github.Bleoo:WindowImageView:1.0.1'
    }
 ```
 
