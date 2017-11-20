@@ -57,6 +57,15 @@ public class DrawableController {
     }
 
     public void process() {
+        if (targetDrawable != null && targetDrawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) targetDrawable;
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            if (!bitmap.isRecycled()) {
+                bitmap.isRecycled();
+            }
+            targetDrawable = null;
+        }
+
         if (frescoEnable) {
             Uri uri = mView.getUri();
             if (uri == null) {
@@ -101,7 +110,13 @@ public class DrawableController {
                     Log.e(TAG, "scale : " + scale);
                     processedWidth = (int) (scale * outWidthPx);
                     processedHeight = (int) (scale * outHeightPx);
-                    listener.onProcessFinished(processedWidth, processedHeight);
+
+                    mView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onProcessFinished(processedWidth, processedHeight);
+                        }
+                    });
 
                     options.inSampleSize = calculateInSampleSize(outWidthPx, outHeightPx, processedWidth, processedHeight);
                     Log.e(TAG, "inSampleSize: " + options.inSampleSize);
