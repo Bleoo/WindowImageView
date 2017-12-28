@@ -1,4 +1,4 @@
-package io.github.bleoo.windowimageview;
+package io.github.bleoo.windowImageView;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -34,8 +34,10 @@ public class WindowImageView extends View {
     private float disPlayTop;       // current draw top
     private int[] location;         // location in window
 
-    private boolean isMeasured;
     private int rescaleHeight;
+    private int realWidth;
+
+    private boolean isMeasured;
 
     private DrawableController mDrawableController;
 
@@ -78,39 +80,46 @@ public class WindowImageView extends View {
                 rescaleHeight = height;
                 resetTransMultiple(height);
                 getLocationInWindow(location);
-                Log("ProcessListener location[0] : " + location[0] + ", location[1] : " + location[1]);
-                Log("ProcessListener rvLocation[1] : " +  rvLocation[1]);
                 disPlayTop = -(location[1] - rvLocation[1]) * translationMultiple;
-                Log("ProcessListener disPlayTop : " + disPlayTop);
                 boundTop();
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        invalidate();
+                    }
+                });
             }
         });
 
+        // here has a bug: post runnable execute ahead of onMeasure
+        // post runnable 先于 onMeasure 执行
         // When looper calls it, view has been initialized
-        post(new Runnable() {
-            @Override
-            public void run() {
-                if (isMeasured) {
-                    mDrawableController.process();
-                }
-            }
-        });
+//        post(new Runnable() {
+//            @Override
+//            public void run() {
+//                Log("post runnable, isMeasured:" + isMeasured);
+//                if (isMeasured) {
+//                    mDrawableController.process();
+//                }
+//            }
+//        });
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        int width = measureHandle(getSuggestedMinimumWidth(), widthMeasureSpec);
+        realWidth = measureHandle(getSuggestedMinimumWidth(), widthMeasureSpec);
         int height = measureHandle(getSuggestedMinimumHeight(), heightMeasureSpec);
-        Log("width : " + width + ", height: " + height);
-        setMeasuredDimension(width, height);
+        Log("width : " + realWidth + ", height: " + height);
+        setMeasuredDimension(realWidth, height);
 
         isMeasured = true;
+        mDrawableController.process();
     }
 
-    public int getFinalWidthWidth() {
-        return getWidth();
+    public int getRealWidth() {
+        return realWidth;
     }
 
     private int measureHandle(int defaultSize, int measureSpec) {
@@ -129,7 +138,6 @@ public class WindowImageView extends View {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        Log("disPlayTop : " + disPlayTop);
         Drawable drawable = mDrawableController.getTargetDrawable();
         if (drawable != null) {
             if (drawable instanceof BitmapDrawable) {
@@ -237,14 +245,13 @@ public class WindowImageView extends View {
     private int rvHeight;
 
     public void bindRecyclerView(RecyclerView recyclerView) {
-        if(recyclerView == null || recyclerView.equals(this.recyclerView)){
+        if (recyclerView == null || recyclerView.equals(this.recyclerView)) {
             return;
         }
         unbindRecyclerView();
         this.recyclerView = recyclerView;
         rvLocation = new int[2];
         rvHeight = recyclerView.getLayoutManager().getHeight();
-        Log("height : " + rvHeight);
         recyclerView.getLocationInWindow(rvLocation);
         recyclerView.addOnScrollListener(rvScrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -255,9 +262,7 @@ public class WindowImageView extends View {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                Log.e(TAG, "dx : " + dx + ", dy : " + dy);
                 if (getTopDistance() > 0 && getTopDistance() + getHeight() < rvHeight) {
-                    Log.e(TAG, "onScrolled translationMultiple : " + translationMultiple);
                     disPlayTop += dy * translationMultiple;
                     boundTop();
                     if (isMeasured) {
@@ -304,7 +309,6 @@ public class WindowImageView extends View {
      */
     private int getTopDistance() {
         getLocationInWindow(location);
-        Log("getTopDistance location[0] : " + location[0] + ", location[1] : " + location[1]);
         return location[1] - rvLocation[1];
     }
 

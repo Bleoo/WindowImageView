@@ -18,7 +18,7 @@ repositories {
 }
 
    dependencies {
-       compile 'com.github.Bleoo:WindowImageView:1.0.1'
+       compile 'com.github.Bleoo:WindowImageView:1.0.2'
    }
 ```
 
@@ -45,6 +45,12 @@ app:frescoEnable="false"
 window_image_view.setFrescoEnable(true);
 window_image_view.setImageURI(YourUri);
 ```
+
+### Revision History
+##### V1.0.2 版本更新说明（2017-12-28）
+- 修复图片不显示问题
+- fresco 图片不显示及小图不放大的问题
+- 包名更换
 
 ## MIT License
 

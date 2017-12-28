@@ -1,4 +1,4 @@
-package io.github.bleoo.windowimageview;
+package io.github.bleoo.windowImageView;
 
 import org.junit.Test;
 

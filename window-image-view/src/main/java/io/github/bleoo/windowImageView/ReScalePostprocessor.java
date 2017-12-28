@@ -1,7 +1,9 @@
-package io.github.bleoo.windowimageview;
+package io.github.bleoo.windowImageView;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.util.Log;
 
 import com.facebook.common.references.CloseableReference;
 import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory;
@@ -27,6 +29,7 @@ public class ReScalePostprocessor extends BasePostprocessor {
     @Override
     public CloseableReference<Bitmap> process(Bitmap sourceBitmap, PlatformBitmapFactory bitmapFactory) {
         float scale = 1.0f * width / sourceBitmap.getWidth();
+        Log.e("ReScalePostprocessor", "scale:" + scale);
 
         scaledWidth = (int) (sourceBitmap.getWidth() * scale);
         scaledHeight = (int) (sourceBitmap.getHeight() * scale);
@@ -35,8 +38,8 @@ public class ReScalePostprocessor extends BasePostprocessor {
 
         Matrix matrix = new Matrix();
         matrix.postScale(scale, scale);
-        CloseableReference<Bitmap> bitmapRef = bitmapFactory.createBitmap(sourceBitmap, 0, 0,
-                sourceBitmap.getWidth(), sourceBitmap.getHeight(), matrix, true);
+        Bitmap bitmap = Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight(), matrix, true);
+        CloseableReference<Bitmap> bitmapRef = bitmapFactory.createBitmap(bitmap);
         try {
             return CloseableReference.cloneOrNull(bitmapRef);
         } finally {

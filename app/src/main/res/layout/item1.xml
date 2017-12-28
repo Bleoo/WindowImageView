@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <io.github.bleoo.windowimageview.WindowImageView
+    <io.github.bleoo.windowImageView.WindowImageView
         android:id="@+id/wiv"
         android:layout_width="match_parent"
         android:layout_height="200dp" />

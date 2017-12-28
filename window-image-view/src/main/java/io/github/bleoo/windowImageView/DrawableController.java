@@ -1,4 +1,4 @@
-package io.github.bleoo.windowimageview;
+package io.github.bleoo.windowImageView;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -46,8 +46,8 @@ public class DrawableController {
     private ProcessListener listener;
 
     // status
-    private boolean hasNewThread;
-    private int currentThreadNum;
+    private boolean isProcessing;
+    private boolean hasNewProcessIn;
 
     public DrawableController(Context context, WindowImageView view) {
         mContext = context;
@@ -57,15 +57,6 @@ public class DrawableController {
     }
 
     public void process() {
-        if (targetDrawable != null && targetDrawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) targetDrawable;
-            Bitmap bitmap = bitmapDrawable.getBitmap();
-            if (!bitmap.isRecycled()) {
-                bitmap.isRecycled();
-            }
-            targetDrawable = null;
-        }
-
         if (frescoEnable) {
             Uri uri = mView.getUri();
             if (uri == null) {
@@ -81,17 +72,18 @@ public class DrawableController {
                     .build();
             setDraweeController(controller);
         } else {
+            if (isProcessing) {
+                return;
+            }
+            isProcessing = true;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+
                     int drawableResId = mView.getImageResource();
                     if (drawableResId == 0) {
+                        isProcessing = false;
                         return;
-                    }
-
-                    currentThreadNum++;
-                    if (currentThreadNum > 1) {
-                        hasNewThread = true;
                     }
 
                     Resources resources = mContext.getResources();
@@ -104,26 +96,22 @@ public class DrawableController {
                     int outWidthPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, options.outWidth, resources.getDisplayMetrics());
                     int outHeightPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, options.outHeight, resources.getDisplayMetrics());
 
-                    float scale = 1.0f * mView.getFinalWidthWidth() / outWidthPx;
-                    Log.e(TAG, "mView.getWidth() : " + mView.getFinalWidthWidth());
+                    float scale = 1.0f * mView.getRealWidth() / outWidthPx;
+                    Log.e(TAG, "mView.getWidth() : " + mView.getRealWidth());
                     Log.e(TAG, "options.outWidth : " + outWidthPx);
                     Log.e(TAG, "scale : " + scale);
                     processedWidth = (int) (scale * outWidthPx);
                     processedHeight = (int) (scale * outHeightPx);
 
-                    mView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onProcessFinished(processedWidth, processedHeight);
-                        }
-                    });
-
                     options.inSampleSize = calculateInSampleSize(outWidthPx, outHeightPx, processedWidth, processedHeight);
-                    Log.e(TAG, "inSampleSize: " + options.inSampleSize);
                     options.inJustDecodeBounds = false;
-                    options.inPreferredConfig = Bitmap.Config.ARGB_4444;
+                    // 低版本有全黑问题
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                        options.inPreferredConfig = Bitmap.Config.ARGB_4444;
+//                    }
 
-                    if (!checkContinue()) {
+                    if (mView == null) {
+                        isProcessing = false;
                         return;
                     }
 
@@ -134,41 +122,26 @@ public class DrawableController {
                     Log.e(TAG, "sourceBitmap.getWidth(): " + sourceBitmap.getWidth());
                     Log.e(TAG, "sourceBitmap.getHeight(): " + sourceBitmap.getHeight());
 
-                    if (!checkContinue()) {
+                    if (mView == null) {
+                        isProcessing = false;
                         return;
                     }
+
                     targetBitmap = Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight(), mMatrix, true);
+                    releaseTargetDrawable();
                     targetDrawable = new BitmapDrawable(targetBitmap);
 
-
-                    if (!checkContinue()) {
-                        return;
-                    }
-                    mView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mView.invalidate();
-                        }
-                    });
+                    listener.onProcessFinished(processedWidth, processedHeight);
 
                     if (sourceBitmap != null) {
                         sourceBitmap.recycle();
                         sourceBitmap = null;
                     }
 
-                    currentThreadNum--;
+                    isProcessing = false;
                 }
             }).start();
         }
-    }
-
-    private boolean checkContinue() {
-        if (hasNewThread || mView == null) {
-            currentThreadNum--;
-            hasNewThread = false;
-            return false;
-        }
-        return true;
     }
 
     private void initDraweeHolder() {
@@ -176,6 +149,17 @@ public class DrawableController {
             GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(mContext.getResources())
                     .build();
             mDraweeHolder = DraweeHolder.create(hierarchy, mContext);
+        }
+    }
+
+    private void releaseTargetDrawable() {
+        if (!frescoEnable && targetDrawable != null && targetDrawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) targetDrawable;
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            if (!bitmap.isRecycled()) {
+                bitmap.isRecycled();
+            }
+            targetDrawable = null;
         }
     }
 
@@ -202,7 +186,7 @@ public class DrawableController {
 
     private ReScalePostprocessor getReScalePostprocessor() {
         if (reScalePostprocessor == null) {
-            reScalePostprocessor = new ReScalePostprocessor(mView.getFinalWidthWidth(), listener);
+            reScalePostprocessor = new ReScalePostprocessor(mView.getRealWidth(), listener);
         }
         return reScalePostprocessor;
     }

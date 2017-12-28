@@ -1,4 +1,4 @@
-package io.github.bleoo.windowimageview;
+package io.github.bleoo.windowImageView;
 
 import android.graphics.Color;
 import android.net.Uri;
@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import io.github.bleoo.simple.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,10 +58,12 @@ public class MainActivity extends AppCompatActivity {
                 holder.windowImageView.setImageResource(R.drawable.timg2);
             } else if (position == 19) {
                 holder.windowImageView.bindRecyclerView(rv_content);
-                holder.windowImageView.setFrescoEnable(false);
-                holder.windowImageView.setImageResource(R.drawable.timg);
-//                holder.windowImageView.setFrescoEnable(true);
+//                holder.windowImageView.setFrescoEnable(false);
+//                holder.windowImageView.setImageResource(R.drawable.timg);
+                holder.windowImageView.setFrescoEnable(true);
 //                holder.windowImageView.setImageURI(Uri.parse("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1510654468262&di=c878e5c02043f8dc7720abaab760549e&imgtype=0&src=http%3A%2F%2Fimg.bbs.cnhubei.com%2Fforum%2Fdvbbs%2F2004-4%2F200441915031894.jpg"));
+                holder.windowImageView.setImageURI(Uri.parse("http://www.fzlu.net/uploads/allimg/150918/3-15091Q00R2a2.jpg"));
+//                holder.windowImageView.setImageURI(Uri.parse("http://pic92.nipic.com/file/20160316/20647925_150655660000_2.jpg"));
             } else {
                 holder.itemView.setBackgroundColor(Color.rgb((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
             }
